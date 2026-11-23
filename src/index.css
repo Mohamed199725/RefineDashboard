@@ -1,0 +1,26 @@
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+  background: #111111;
+}
+
+body,
+.ant-layout,
+.ant-layout-sider,
+.ant-layout-header,
+.ant-card,
+.ant-modal-content,
+.ant-modal-header,
+.ant-drawer-content {
+  background: #111111 !important;
+}
+
+.ant-card,
+.ant-modal-content,
+.ant-modal-header,
+.ant-layout-sider,
+.ant-layout-header {
+  border-color: #303030 !important;
+}
