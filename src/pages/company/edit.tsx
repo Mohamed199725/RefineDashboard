@@ -1,4 +1,6 @@
-import { Col, Form, Input, InputNumber, Row, Select } from 'antd'
+import React from 'react'
+import { Col, Form, Input, InputNumber, Row, Select, Upload, Button, Space } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
 import { Edit, useForm, useSelect } from '@refinedev/antd'
 import { UPDATE_COMPANY_MUTATION } from '@/graphql/mutations';
 import CustomAvatar from '@/components/custom-avatar';
@@ -9,6 +11,7 @@ import { USERS_SELECT_QUERY } from '@/graphql/queries';
 import SelectOptionWithAvatar from '@/components/select-option-with-avatar';
 import { businessTypeOptions, companySizeOptions, industryOptions } from '@/constants';
 import { CompanyContactsTable } from './contacts-table';
+import { getCompanyAvatarOverride, resizeCompanyImage, setCompanyAvatarOverride } from '@/utilities/company-avatar';
 
 const EditPage = () => {
   const { saveButtonProps, formProps, formLoading, queryResult } = useForm({
@@ -19,6 +22,17 @@ const EditPage = () => {
   });
 
   const { avatarUrl, name } = queryResult?.data?.data || {}
+  const companyId =
+    queryResult?.data?.data?.id === undefined
+      ? undefined
+      : String(queryResult.data.data.id);
+  const [companyImage, setCompanyImage] = React.useState<string>();
+
+  React.useEffect(() => {
+    setCompanyImage(getCompanyAvatarOverride(companyId));
+  }, [companyId]);
+
+  const displayedAvatar = companyImage || avatarUrl;
 
   const { selectProps, queryResult: queryResultUsers } = useSelect<GetFieldsFromList<UsersSelectQuery>>({
     resource: 'users',
@@ -41,7 +55,25 @@ const EditPage = () => {
             breadcrumb={false}
           >
             <Form {...formProps} layout='vertical'>
-              <CustomAvatar shape="square" src={avatarUrl} name={getNameInitials(name || '')} style={{width: 96, height: 96, marginBottom: '24px'}} />
+              <Space align="center" style={{ marginBottom: '24px' }}>
+                <CustomAvatar shape="square" src={displayedAvatar} name={getNameInitials(name || '')} style={{ width: 96, height: 96 }} />
+                <Upload
+                  accept="image/*"
+                  showUploadList={false}
+                  beforeUpload={async (file) => {
+                    try {
+                      const image = await resizeCompanyImage(file);
+                      setCompanyImage(image);
+                      if (companyId) setCompanyAvatarOverride(String(companyId), image);
+                    } catch (error) {
+                      console.error(error);
+                    }
+                    return false;
+                  }}
+                >
+                  <Button icon={<UploadOutlined />}>Change image</Button>
+                </Upload>
+              </Space>
           <Form.Item
             label="Sales owner"
             name="salesOwnerId"

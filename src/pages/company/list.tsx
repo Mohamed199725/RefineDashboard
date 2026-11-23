@@ -9,6 +9,7 @@ import { CreateButton, DeleteButton, EditButton, FilterDropdown, List, useTable 
 import { HttpError, getDefaultFilter, useGo } from '@refinedev/core'
 import { GetFieldsFromList } from '@refinedev/nestjs-query';
 import { Input, Space, Table } from 'antd';
+import { getCompanyAvatarOverride } from '@/utilities/company-avatar';
 
 export const CompanyList = ({ children }: React.PropsWithChildren) => {
   const go = useGo();
@@ -91,7 +92,7 @@ export const CompanyList = ({ children }: React.PropsWithChildren) => {
           )}
           render={(value, record) => (
             <Space>
-              <CustomAvatar shape="square" name={record.name} src={record.avatarUrl} />
+              <CustomAvatar shape="square" name={record.name} src={getCompanyAvatarOverride(record.id) || record.avatarUrl} />
               <Text style={{ whiteSpace: 'nowrap' }}>
               {record.name}
               </Text>
